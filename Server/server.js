@@ -9,6 +9,8 @@ import cookieParser from "cookie-parser";
 import { connectDB } from "./utils/db.js";
 import { responseMiddleware } from "./middlewares/responseMiddleware.js"
 import errorHandler from "./middlewares/errorHandler.js";
+import userRoutes from './routes/userRoutes.js';
+
 
 // Db connection
 connectDB();
@@ -33,6 +35,7 @@ app.use(cors({
     credentials: true,
 }));
 
+app.use('/api/users', userRoutes);
 
 // error handler middleware - return structured error message - this should be always placed beneath the routes to work
 app.use(errorHandler);
