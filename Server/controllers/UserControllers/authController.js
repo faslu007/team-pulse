@@ -31,6 +31,29 @@ export const registerUser = asyncHandler(async (req, res) => {
         });
     }
 
+    if (password.length < 5) {
+        return res.status(400).json({
+            message: `Password should have minimum 5 characters.`
+        });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({
+            message: `Invalid email format.`
+        });
+    }
+
+    //  Validate if user already registered by the payload email
+    const isUserRegistered = await User.findOne({ email: email });
+    if (isUserRegistered) {
+        return res.status(400).json({
+            message: `An account is already registered by the given email.`
+        });
+    }
+
+
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -57,7 +80,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 
             const response = await User.findById(user._id).select('-password');
             // Send response back to client
-            return res.status(200).json({ message: 'Ok', data: response });
+            return res.status(201).json(response);
         }
     } catch (error) {
         // Respond with error status and message
@@ -99,13 +122,22 @@ export const loginUser = asyncHandler(async (req, res) => {
         if (!(await bcrypt.compare(password, hashedPassword))) {
             return res.status(400).json({ message: 'Incorrect password.' });
         }
+        // Need a fix
+        const response = user.toObject();
+        delete response.password
 
-        delete user.password;
+        const jwtToken = generateToken({ id: user._id });
+        const serialized = serialize('token', jwtToken, {
+            httpOnly: true,
+            // secure: process.env.NODE_ENV === 'production',
+            secure: false,
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 30,
+            path: '/',
+        });
+        res.setHeader('Set-Cookie', serialized);
 
-        return res.status(200).json({
-            message: "Login Success",
-            user
-        })
+        return res.status(200).json(response)
     } catch (error) {
         res.status(500).json({ error: error.message || 'Internal server error' });
     }
