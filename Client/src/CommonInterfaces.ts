@@ -10,3 +10,11 @@ export interface ApiError {
         status: number;
     }
 }
+
+
+export interface apiStatus {
+    isLoading: boolean,
+    isError: boolean,
+    isSuccess: boolean,
+    message: string
+}

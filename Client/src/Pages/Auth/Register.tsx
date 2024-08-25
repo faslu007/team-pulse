@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Box, Button, TextField, Typography, Grid, InputAdornment, IconButton } from "@mui/material";
 import AppRegistrationRoundedIcon from '@mui/icons-material/AppRegistrationRounded';
 import { RegisterInput } from "./AuthInterface";
-import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { RootState } from "../../../Store";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { RootState } from "../../Store";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { registerUser } from "./AuthThunk";
 

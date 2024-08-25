@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { publicApi } from "../../../api";
+import { publicApi } from "../../api";
 import axios from "axios";
 import { RegisterInput } from "./AuthInterface";
 

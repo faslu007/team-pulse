@@ -1,3 +1,5 @@
+import { apiStatus } from "../../CommonInterfaces";
+
 // Define types for each section of your state
 export interface LoginInput {
     email: string;
@@ -29,14 +31,6 @@ export interface SessionUser {
 
 export interface LoginResponse {
     user: SessionUser
-}
-
-
-interface apiStatus {
-    isLoading: boolean,
-    isError: boolean,
-    isSuccess: boolean,
-    message: string
 }
 
 // Define the main state type

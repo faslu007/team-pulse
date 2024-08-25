@@ -1,10 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authSlice from './Components/Pages/Auth/AuthSlices';
-
+import authSlice from './Pages/Auth/AuthSlices';
+import gameManageSlice from "./Pages/Rooms/Games/GameSlices"
 // Type for the store
 export const store = configureStore({
     reducer: {
-        auth: authSlice
+        auth: authSlice,
+        gameManage: gameManageSlice
     },
 });
 

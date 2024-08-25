@@ -65,6 +65,13 @@ const theme = createTheme({
                     '& .MuiInputLabel-root': {
                         color: '#b0b0b0', // Lighter label color
                     },
+                    '& .Mui-disabled': {
+                        backgroundColor: '#2c313e', // Match the dark base background
+                        color: '#6c757d', // Use a muted color for disabled text
+                        '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#6c757d', // Light gray border for disabled state
+                        },
+                    },
                 },
             },
         },
