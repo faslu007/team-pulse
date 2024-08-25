@@ -21,42 +21,6 @@ const slideSchema = new Schema({
     }
 });
 
-const teamSchema = new Schema({
-    teamName: {
-        type: String,
-        required: true,
-        trim: true
-    }
-});
-
-const memberSchema = new Schema({
-    userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    teamId: {
-        type: String,
-        required: true
-    },
-    active: {
-        type: Boolean,
-        default: true
-    }
-});
-
-const scoreSchema = new Schema({
-    userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    score: {
-        type: Number,
-        default: 0
-    }
-});
-
 const buzzerSchema = new Schema({
     status: {
         type: String,
@@ -81,6 +45,45 @@ const buzzerInteractionSchema = new Schema({
     }
 });
 
+
+const teamSchema = new Schema({
+    teamName: {
+        type: String,
+        required: true,
+        trim: true
+    }
+});
+
+
+const scoreSchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    score: {
+        type: Number,
+        default: 0
+    }
+});
+
+const memberSchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    teamId: {
+        type: String,
+        required: true
+    },
+    active: {
+        type: Boolean,
+        default: true
+    }
+});
+
+
 const gameSchema = new Schema({
     roomId: {
         type: Schema.Types.ObjectId,
@@ -88,8 +91,8 @@ const gameSchema = new Schema({
         required: true
     },
     slides: [slideSchema],
+    participants: [memberSchema],
     teams: [teamSchema],
-    members: [memberSchema],
     memberScores: [scoreSchema],
     buzzer: buzzerSchema,
     buzzerInteractions: [buzzerInteractionSchema]

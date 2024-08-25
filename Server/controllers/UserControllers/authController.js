@@ -4,6 +4,7 @@ import asyncHandler from 'express-async-handler';
 import { serialize } from 'cookie';
 import User from "../../models/User.js";
 import { generateToken } from "../../utils/jwtUtils.js";
+import { capitalizeFirstLetter } from '../../utils/commonUtils.js';
 
 
 
@@ -59,12 +60,12 @@ export const registerUser = asyncHandler(async (req, res) => {
 
     try {
         const user = await User.create({
-            firstName,
-            lastName,
+            firstName: capitalizeFirstLetter(firstName),
+            lastName: capitalizeFirstLetter(lastName),
             password: hashedPassword,
             email,
             notificationSound: notificationSound || false
-        })
+        });
 
         if (user._id) {
             const jwtToken = generateToken({ id: user._id });
@@ -122,7 +123,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         if (!(await bcrypt.compare(password, hashedPassword))) {
             return res.status(400).json({ message: 'Incorrect password.' });
         }
-        // Need a fix
+
         const response = user.toObject();
         delete response.password
 
