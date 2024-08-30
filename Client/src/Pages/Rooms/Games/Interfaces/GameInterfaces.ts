@@ -3,11 +3,11 @@ import { apiStatus } from "../../../../CommonInterfaces";
 export interface GameBasic {
     id?: string,
     gameName?: string,
-    roomType?: string | number;
-    gameBeginsAt?: Date | null;
-    gameEndsAt?: Date | null;
+    roomType?: 'game' | 'vote';
+    gameBeginsAt?: Date | null | string;
+    gameEndsAt?: Date | null | string;
     invitationMessage?: string;
-    roomStatus?: string | number;
+    roomStatus?: 'draft' | 'publish' | 'archived';
 }
 
 // Define the GameState interface

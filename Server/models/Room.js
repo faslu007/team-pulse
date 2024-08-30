@@ -10,6 +10,11 @@ const roomSchema = new Schema({
         required: true,
         trim: true,
     },
+    invitationMessage: {
+        type: String,
+        required: false,
+        trim: true,
+    },
     roomType: {
         type: String,
         enum: ['vote', 'game'],

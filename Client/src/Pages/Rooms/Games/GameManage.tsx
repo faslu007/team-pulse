@@ -2,8 +2,13 @@ import { TabContext, TabList, TabPanel } from "@mui/lab"
 import { Paper, Tab } from "@mui/material"
 import { useState } from "react";
 import GameBasic from "./GameBasic";
+import { useAppSelector } from "../../../hooks";
+import { GameBasic as GameBasicInterface } from "./Interfaces/GameInterfaces";
+import { RootState } from "../../../Store";
 
 function GameManage() {
+    const gameBasicInputData: GameBasicInterface = useAppSelector((state: RootState) => state.gameManage.gameBasicData);
+
     const [tabValue, setTabValue] = useState('1');
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -39,8 +44,8 @@ function GameManage() {
                     }}
                 >
                     <Tab label="Details" value="1" />
-                    <Tab label="Content" value="2" disabled />
-                    <Tab label="Participants" value="3" disabled />
+                    <Tab label="Content" value="2" disabled={!gameBasicInputData.id} />
+                    <Tab label="Participants" value="3" disabled={!gameBasicInputData.id} />
                 </TabList>
 
                 <TabPanel

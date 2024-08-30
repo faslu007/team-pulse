@@ -1,15 +1,40 @@
-import { Button, Grid, TextField } from "@mui/material";
+import { Button, CircularProgress, Grid, TextField } from "@mui/material";
 import SelectComponent from "../../../commons/SingleSelectBox";
 import DateTimePickerCommon from "../../../commons/DateTimePicker";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { RootState } from "../../../Store";
 import { GameBasic, GameState } from "./Interfaces/GameInterfaces";
 import { gameStatusOptions, roomTypeOptions } from "../../../commonConstatns";
+import { createRoom } from "./GameThunk";
+import { useEffect } from "react";
+import { useSnackbar } from "../../../commons/Snackbar/Snackbar";
 
 function GameBasicDetails() {
     const dispatch = useAppDispatch();
+    const { showSnackbar } = useSnackbar();
     const gameBasicInputData: GameBasic = useAppSelector((state: RootState) => state.gameManage.gameBasicData);
-    // const apiStatus: GameState["apiStatus"] = useAppSelector((state: RootState) => state.gameManage.apiStatus);
+    const apiStatus: GameState["apiStatus"] = useAppSelector((state: RootState) => state.gameManage.apiStatus);
+
+    const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        if (!gameBasicInputData.id) {
+            dispatch(createRoom({
+                roomName: gameBasicInputData.gameName,
+                roomType: gameBasicInputData.roomType,
+                roomStatus: gameBasicInputData.roomStatus,
+                roomStartsAt: gameBasicInputData.gameBeginsAt,
+                roomExpiresAt: gameBasicInputData.gameEndsAt,
+                invitationMessage: gameBasicInputData.invitationMessage ?? ""
+            }));
+        }
+    };
+
+    useEffect(() => {
+        if (apiStatus.message) {
+            showSnackbar(true, apiStatus.isError ? "error" : apiStatus.isSuccess ? "success" : "warning", apiStatus.message, 10000);
+            dispatch({ type: "gameManage/resetStatusState" });
+        }
+    }, [apiStatus.message]);
 
 
 
@@ -183,9 +208,17 @@ function GameBasicDetails() {
                         size="large"
                         sx={{
                             padding: '10px 20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}
+                        onClick={handleSubmit}
                     >
-                        Create
+                        {apiStatus.isLoading ? (
+                            <CircularProgress size={24} color="inherit" />
+                        ) : (
+                            gameBasicInputData.id ? "Update" : "Create"
+                        )}
                     </Button>
                 </div>
             </Grid>

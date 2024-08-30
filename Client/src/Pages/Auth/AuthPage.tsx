@@ -46,6 +46,7 @@ const Auth: React.FC = () => {
                 <Typography
                     variant={isMobile ? "h4" : "h3"}
                     sx={{
+                        fontStyle: 'italic',
                         fontWeight: 700,
                         fontFamily: "'Poppins', sans-serif",
                         fontSize: isMobile ? '50' : '90px',
