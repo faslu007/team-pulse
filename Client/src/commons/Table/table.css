@@ -1,0 +1,146 @@
+.table-container {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Updated to match theme's soft shadow */
+    background-color: #ffffff; /* Use theme's paper background color */
+}
+
+.custom-table {
+    font-family: 'Lato', 'Poppins', 'Roboto', 'Arial', sans-serif; /* Updated font family */
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+    background-color: #393e4a; 
+}
+
+.table-scroll {
+    overflow-y: auto;
+    max-height: auto !important; /* Ensure scrollability on smaller screens */
+}
+
+.sticky-column {
+    position: sticky;
+    left: 0;
+    z-index: 2 !important;
+    background-color: #ffffff; /* Ensure sticky columns match background */
+}
+
+thead .sticky-column {
+    z-index: 3 !important;
+}
+
+.sticky-column-background {
+    background: #f5f5f5 !important; /* Use light base for sticky column backgrounds */
+}
+
+/* Column size classes */
+.small {
+    width: 20%;
+}
+
+.medium {
+    width: 30%;
+}
+
+.large {
+    width: 40%;
+}
+
+.extra-small {
+    width: 10%;
+}
+
+td, th {
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    padding: 12px 16px;
+    font-weight: 400;
+    color: #333333; /* Updated to match theme's primary text color */
+}
+
+/* Striped rows */
+.striped:nth-child(even) {
+    background-color: #484c57; /* Updated to match the theme's hover color */
+}
+
+/* Hover effect */
+.hover:hover {
+    background-color: #4e5d73; /* Use the theme's light base for hover */
+    transition: background-color 0.2s ease-in-out;
+}
+
+th {
+    font-weight: 600;
+    background-color: #3a3f55; /* Use the theme's primary color */
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    color: #ffffff; /* Ensure text color contrasts with background */
+}
+
+.header-cell {
+    color: #3a3f55; /* Use theme's primary color for header cells */
+}
+
+.header-text {
+    font-weight: bold;
+    color: #ffffff !important; /* Ensure white text in header */
+}
+
+.trimmed-text {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+/* table.css */
+.desktop-font {
+    font-size: 1em;
+}
+
+.mobile-font {
+    font-size: 0.8em;
+}
+
+/* New styles for mobile screens */
+@media (max-width: 768px) {
+    .custom-table {
+        font-size: 14px;
+    }
+
+    td, th {
+        padding: 6px 10px;
+    }
+
+    th {
+        font-size: 14px;
+    }
+
+    .table-scroll {
+        max-height: auto !important;
+    }
+
+    .custom-table {
+        width: auto !important;
+        overflow-x: visible !important;
+    }
+
+    .table-container {
+        border-radius: 0;
+    }
+
+    .header-cell {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .hover:hover {
+        background-color: #f5f5f5;
+    }
+}

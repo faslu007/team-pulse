@@ -1,5 +1,5 @@
 import { getNextTimeWithOffset } from "../../../utls";
-import { createRoom } from "./GameThunk";
+import { createRoom, getRooms, updateRoom } from "./GameThunk";
 import { UpdateInputFieldValuesPayload, GameState } from "./Interfaces/GameInterfaces";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -12,6 +12,7 @@ const gameInitialState: GameState = {
         message: ""
     },
     gameBasicData: {
+        _id: "",
         id: "",
         gameName: "",
         roomType: "game",
@@ -19,6 +20,11 @@ const gameInitialState: GameState = {
         gameEndsAt: getNextTimeWithOffset(60),
         invitationMessage: "",
         roomStatus: "draft"
+    },
+    roomsList: [],
+    roomsListPagination: {
+        page: 1,
+        totalPages: 0
     }
 };
 
@@ -31,6 +37,11 @@ const gameManageSlice = createSlice({
             action: PayloadAction<UpdateInputFieldValuesPayload>
         ) => {
             const { stateToUpdate, field, value } = action.payload;
+
+            if (field == 'mainState') {
+                state[stateToUpdate] = value;
+                return;
+            }
 
             // Ensure the stateToUpdate key exists in the state
             if (stateToUpdate in state) {
@@ -61,7 +72,7 @@ const gameManageSlice = createSlice({
                     state.apiStatus.isLoading = false;
                     state.apiStatus.isSuccess = true;
                     state.apiStatus.isError = false;
-                    state.apiStatus.message = "Room created successfully.  Now, you may add contents and participants!!!";
+                    state.apiStatus.message = "Game created successfully.  Now, you may add contents and participants!!!";
                 }
             })
             .addCase(createRoom.rejected, (state, action) => {
@@ -75,7 +86,61 @@ const gameManageSlice = createSlice({
                 state.apiStatus.message = typeof errorMessage === 'string'
                     ? errorMessage
                     : 'An error occurred while making the request.';
+            })
 
+            .addCase(updateRoom.pending, (state) => {
+                state.apiStatus.isLoading = true;
+                state.apiStatus.isError = false;
+                state.apiStatus.isSuccess = false;
+            })
+            .addCase(updateRoom.fulfilled, (state, action) => {
+                if (action.payload?.room) {
+                    state.gameBasicData = {
+                        ...action.payload.room,
+                        gameBeginsAt: action.payload.room.roomStartsAt,
+                        gameEndsAt: action.payload.room.roomExpiresAt,
+                        gameName: action.payload.room.roomName,
+                        invitationMessage: action.payload.room.invitationMessage ?? ""
+                    };
+                    state.apiStatus.isLoading = false;
+                    state.apiStatus.isSuccess = true;
+                    state.apiStatus.isError = false;
+                    state.apiStatus.message = "Game updated successfully.  Now, you may add contents and participants!!!";
+                }
+            })
+            .addCase(updateRoom.rejected, (state, action) => {
+                state.apiStatus.isLoading = false;
+                state.apiStatus.isError = true;
+                state.apiStatus.isSuccess = false;
+                // Type assertion to avoid using `any`
+                const errorMessage = (action.payload?.error?.message?.error?.message as string) || 'An error occurred while making the request.';
+
+                // Set the state message
+                state.apiStatus.message = typeof errorMessage === 'string'
+                    ? errorMessage
+                    : 'An error occurred while making the request.';
+            })
+
+
+            .addCase(getRooms.pending, (state) => {
+                state.apiStatus.isLoading = true;
+                state.apiStatus.isError = false;
+                state.apiStatus.isSuccess = false;
+            })
+            .addCase(getRooms.fulfilled, (state, action) => {
+                if (action.payload?.result) {
+                    state.roomsList = action.payload?.result;
+                    state.apiStatus.isLoading = false;
+                    state.apiStatus.isSuccess = true;
+                    state.apiStatus.isError = false;
+                    state.roomsListPagination.totalPages = action.payload.totalPages;
+                    state.roomsListPagination.page = action.payload.page;
+                }
+            })
+            .addCase(getRooms.rejected, (state) => {
+                state.apiStatus.isLoading = false;
+                state.apiStatus.isError = false;
+                state.apiStatus.isSuccess = false;
             })
     }
 });

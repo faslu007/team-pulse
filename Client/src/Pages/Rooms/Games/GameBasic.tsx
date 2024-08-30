@@ -5,9 +5,10 @@ import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { RootState } from "../../../Store";
 import { GameBasic, GameState } from "./Interfaces/GameInterfaces";
 import { gameStatusOptions, roomTypeOptions } from "../../../commonConstatns";
-import { createRoom } from "./GameThunk";
+import { createRoom, updateRoom } from "./GameThunk";
 import { useEffect } from "react";
 import { useSnackbar } from "../../../commons/Snackbar/Snackbar";
+
 
 function GameBasicDetails() {
     const dispatch = useAppDispatch();
@@ -19,6 +20,16 @@ function GameBasicDetails() {
         e.preventDefault();
         if (!gameBasicInputData.id) {
             dispatch(createRoom({
+                roomName: gameBasicInputData.gameName,
+                roomType: gameBasicInputData.roomType,
+                roomStatus: gameBasicInputData.roomStatus,
+                roomStartsAt: gameBasicInputData.gameBeginsAt,
+                roomExpiresAt: gameBasicInputData.gameEndsAt,
+                invitationMessage: gameBasicInputData.invitationMessage ?? ""
+            }));
+        } else if (gameBasicInputData.id) {
+            dispatch(updateRoom({
+                id: gameBasicInputData.id,
                 roomName: gameBasicInputData.gameName,
                 roomType: gameBasicInputData.roomType,
                 roomStatus: gameBasicInputData.roomStatus,
@@ -217,12 +228,11 @@ function GameBasicDetails() {
                         {apiStatus.isLoading ? (
                             <CircularProgress size={24} color="inherit" />
                         ) : (
-                            gameBasicInputData.id ? "Update" : "Create"
+                                (!gameBasicInputData.id && !gameBasicInputData._id) ? "Create" : "Update"
                         )}
                     </Button>
                 </div>
             </Grid>
-
         </Grid>)
 };
 

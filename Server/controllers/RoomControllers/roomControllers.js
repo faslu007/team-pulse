@@ -77,6 +77,87 @@ export const registerRoom = asyncHandler(async (req, res) => {
 })
 
 
+/**
+ * Update a room 
+ * Route /rooms/updateRoom/:id
+ * Access Private
+ * Method PUT
+ */
+export const updateRoom = asyncHandler(async (req, res) => {
+    const id = req.params.id;
+
+    if (!id) {
+        return res.status(400).json({
+            message: `Room / Game Id is required for update request.`
+        });
+    }
+
+    const { roomName, roomType, roomStatus, roomStartsAt, roomExpiresAt, invitationMessage } = req.body;
+
+    const requiredFields = { roomName, roomType, roomStatus, roomStartsAt, roomExpiresAt };
+    const missingFields = Object.keys(requiredFields).filter(key => !requiredFields[key]);
+    if (missingFields.length > 0) {
+        return res.status(400).json({
+            message: `Missing required field(s): ${missingFields.join(', ')}`
+        });
+    }
+
+    if (roomName.length < 3) {
+        return res.status(400).json({
+            message: `Room / Game name should be of 5 chars length.`
+        });
+    };
+
+    // Validate and format date fields
+    try {
+        // Parse dates
+        const startDate = moment.parseZone(roomStartsAt).toISOString();
+        const endDate = moment.parseZone(roomExpiresAt).toISOString();
+
+        // Optional: Validate if the start date is before the end date
+        if (moment(startDate).isAfter(endDate)) {
+            return res.status(400).json({
+                message: 'Start date must be before end date.'
+            });
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({
+            message: 'Invalid date format or From date greater than to date.',
+        });
+    }
+
+    try {
+        const room = await Room.findByIdAndUpdate(
+            id,
+            {
+                roomName,
+                roomType,
+                roomStartsAt,
+                roomExpiresAt,
+                roomStatus,
+                updatedBy: req.user.id,
+                invitationMessage: invitationMessage ?? ""
+            },
+            { new: true } // This option returns the updated document
+        );
+
+        if (room) {
+            return res.status(200).json({
+                room
+            });
+        } else {
+            throw new Error("An error occurred while updating the room / game session.");
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({
+            message: 'An error occurred while saving the room / game.',
+        });
+    }
+})
+
+
 
 /**
  * List rooms 
