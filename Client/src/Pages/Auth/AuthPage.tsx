@@ -1,4 +1,5 @@
 import { Box, Divider, useMediaQuery, Typography } from "@mui/material";
+import { motion } from "framer-motion";
 import { useTheme as muiUseTheme } from '@mui/material/styles';
 import Login from "./Login";
 import Register from "./Register";
@@ -8,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks";
 import { RootState } from "../../Store";
 import { AuthState } from "./AuthInterface";
 import { useSnackbar } from "../../commons/Snackbar/Snackbar";
+import TeamPulse from "./HeroText";
 
 const Auth: React.FC = () => {
     const muiTheme = muiUseTheme();
@@ -43,18 +45,7 @@ const Auth: React.FC = () => {
                 textAlign="center"
                 p={2}
             >
-                <Typography
-                    variant={isMobile ? "h4" : "h3"}
-                    sx={{
-                        fontStyle: 'italic',
-                        fontWeight: 700,
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: isMobile ? '50' : '90px',
-                        color: muiTheme.palette.mode == "dark" ? "#fff" : "",
-                    }}
-                >
-                    team-pulse
-                </Typography>
+                <TeamPulse muiTheme={muiTheme} />
                 <Typography
                     variant="subtitle1"
                     sx={{

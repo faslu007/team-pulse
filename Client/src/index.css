@@ -1,0 +1,12 @@
+.wrapperClassName {
+  height: 500px;
+}
+
+.editorClassName {
+    background-color: #fff !important;
+    color: rgb(63, 59, 59);
+}
+
+.toolbarClassName {
+    color: rgb(63, 59, 59);
+}

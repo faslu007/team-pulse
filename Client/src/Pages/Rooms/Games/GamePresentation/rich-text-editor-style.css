@@ -1,0 +1,17 @@
+/* Styling for the WYSIWYG editor container */
+.editor-container {
+    background-color: white; /* White background for the typing area */
+    border: 1px solid #ccc; /* Optional: Border around the editor */
+    border-radius: 4px; /* Optional: Rounded corners for the editor */
+}
+
+/* Styling for the toolbar icons */
+.DraftEditor-toolbar {
+    background-color: #f0f0f0; /* Light gray background for the toolbar */
+    border-bottom: 1px solid #ccc; /* Optional: Border below the toolbar */
+}
+
+/* Styling for toolbar buttons/icons */
+.DraftEditor-toolbar button {
+    color: #333; /* Dark gray color for icons */
+}

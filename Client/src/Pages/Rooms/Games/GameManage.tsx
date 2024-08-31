@@ -8,6 +8,7 @@ import { RootState } from "../../../Store";
 import TableComponent from "../../../commons/Table/Table";
 import { getRooms } from "./GameThunk";
 import { updateInputFieldValues } from "./GameSlices";
+import GamePresentation from "./GamePresentation/GamePresentation";
 
 
 const tableColumns = [
@@ -115,7 +116,9 @@ function GameManage() {
                         <Pagination count={roomsListPagination.totalPages} page={roomsListPagination.page} onChange={handlePageChange} />
                     </Grid>
                 </TabPanel>
-                <TabPanel value="2">Item Two</TabPanel>
+
+
+                <TabPanel value="2"><GamePresentation /></TabPanel>
             </TabContext>
         </Paper>
     )

@@ -201,7 +201,7 @@ export const getRoomsList = asyncHandler(async (req, res) => {
     try {
         // Fetch the list of rooms
         const rooms = await Room.find(query)
-            .sort({ createdAt: -1 })
+            .sort({ updatedAt: -1 })
             .limit(parsedPageSize)
             .skip(skip)
             .lean({ virtuals: true })
