@@ -1,6 +1,6 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab"
 import { Grid, Pagination, Paper, Tab } from "@mui/material"
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import GameBasic from "./GameBasic";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { GameBasic as GameBasicInterface, Room } from "./Interfaces/GameInterfaces";
@@ -8,7 +8,9 @@ import { RootState } from "../../../Store";
 import TableComponent from "../../../commons/Table/Table";
 import { getRooms } from "./GameThunk";
 import { updateInputFieldValues } from "./GameSlices";
-import GamePresentation from "./GamePresentation/GamePresentation";
+import GamePresentationConfigure from "./GamePresentation/GamePresentationConfigure";
+import { useSnackbar } from "../../../commons/Snackbar/Snackbar";
+import { updateInputFieldValues as gamePresentationDraftStateUpdate } from "./GamePresentation/GamePresentationSlice";
 
 
 const tableColumns = [
@@ -21,7 +23,10 @@ const tableColumns = [
 
 function GameManage() {
     const dispatch = useAppDispatch();
+    const { showSnackbar } = useSnackbar();
     const sessionUser = useAppSelector((state: RootState) => state.auth.sessionUser);
+    const userId = useMemo(() => sessionUser?.id, [sessionUser]);
+
     const gameBasicInputData: GameBasicInterface = useAppSelector((state: RootState) => state.gameManage.gameBasicData);
     const roomsList = useAppSelector((state: RootState) => state.gameManage.roomsList);
     const roomsListPagination = useAppSelector((state: RootState) => state.gameManage.roomsListPagination);
@@ -40,7 +45,7 @@ function GameManage() {
                 pageSize: 5,
             }))
         }
-    }, [sessionUser?.id])
+    }, [userId])
 
     const onEditGameRoom = (row: Room) => {
         const gameState = {
@@ -52,7 +57,22 @@ function GameManage() {
             invitationMessage: row.invitationMessage ?? "",
             roomStatus: row.roomStatus,
         }
-        dispatch(updateInputFieldValues({ stateToUpdate: 'gameBasicData', field: 'mainState', value: gameState }))
+        dispatch(updateInputFieldValues({ stateToUpdate: 'gameBasicData', field: 'mainState', value: gameState }));
+
+        if (row.firstSlideId) {
+            dispatch(gamePresentationDraftStateUpdate({
+                field: 'mainState',
+                stateToUpdate: 'activeRoomId',
+                value: row._id
+            }));
+            dispatch(gamePresentationDraftStateUpdate({
+                field: 'mainState',
+                stateToUpdate: 'activeSlideId',
+                value: row.firstSlideId
+            }));
+        }
+
+        showSnackbar(true, "info", "Item moved to the edit window! You can now edit it.", 3000);
     }
 
     const handlePageChange = (e: ChangeEvent<unknown>, newPage: number) => {
@@ -118,7 +138,7 @@ function GameManage() {
                 </TabPanel>
 
 
-                <TabPanel value="2"><GamePresentation /></TabPanel>
+                <TabPanel value="2"><GamePresentationConfigure /></TabPanel>
             </TabContext>
         </Paper>
     )

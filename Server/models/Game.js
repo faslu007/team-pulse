@@ -7,18 +7,24 @@ const slideSchema = new Schema({
         type: Number,
         required: true
     },
-    contentType: {
+    activeContentType: {
         type: String,
-        enum: ['audio', 'video', 'richText', 'image'],
+        enum: ['richText', 'mediaContent'],
         required: true
     },
-    richTextContent: {
+    mediaContentType: {
         type: String,
-        trim: true
+        enum: ['audio', 'video', 'image'],
     },
-    mediaUri: {
+    contentTypeExtension: {
         type: String,
-    }
+    },
+    mediaContentUri: {
+        type: String,
+    },
+    richTextContent: {
+        type: Object,
+    },
 });
 
 const buzzerSchema = new Schema({

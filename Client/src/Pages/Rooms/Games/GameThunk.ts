@@ -2,6 +2,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { privateApi } from "../../../api";
 import axios, { AxiosError } from "axios";
 import { Room } from "./Interfaces/GameInterfaces";
+import { RootState } from "../../../Store";
+import { updateInputFieldValues as gamePresentationDraftStateUpdate } from "./GamePresentation/GamePresentationSlice";
 
 // Payload for creating a room
 interface CreateRoomPayload {
@@ -34,7 +36,8 @@ interface NewRoomResponseStructure {
         __v: number;
         id: string; // Duplicate of _id
         invitationMessage: string | null
-    }
+    },
+    slideId?: string;
     error: string | null;
     status: number; // HTTP status code
 }
@@ -54,15 +57,33 @@ interface ApiErrorResponse {
 // Thunk for creating a room
 export const createRoom = createAsyncThunk<NewRoomResponseStructure, CreateRoomPayload, { rejectValue: ApiErrorResponse }>(
     'gameManage/createRoom',
-    async (createRoomPayload, { rejectWithValue }) => {
+    async (createRoomPayload, thunkApi) => {
         try {
             const response = await privateApi.post<NewRoomResponseStructure>("rooms/createRoom", createRoomPayload);
+            const state = thunkApi.getState() as RootState;
+            thunkApi.dispatch(getRooms({
+                createdBy: state.auth.sessionUser?._id,
+                page: 1,
+                pageSize: 5
+            }));
+
+            thunkApi.dispatch(gamePresentationDraftStateUpdate({
+                field: 'mainState',
+                stateToUpdate: 'activeRoomId',
+                value: response.data.room._id
+            }));
+            thunkApi.dispatch(gamePresentationDraftStateUpdate({
+                field: 'mainState',
+                stateToUpdate: 'activeSlideId',
+                value: response.data.slideId
+            }));
+
             return response.data;
         } catch (error) {
             // Handle Axios errors
             if (axios.isAxiosError(error)) {
                 const axiosError = error as AxiosError<ApiErrorResponse>;
-                return rejectWithValue({
+                return thunkApi.rejectWithValue({
                     success: false,
                     data: null,
                     error: {
@@ -72,7 +93,7 @@ export const createRoom = createAsyncThunk<NewRoomResponseStructure, CreateRoomP
                 });
             }
             // Handle any other unexpected errors
-            return rejectWithValue({
+            return thunkApi.rejectWithValue({
                 success: false,
                 data: null,
                 error: {
@@ -87,15 +108,23 @@ export const createRoom = createAsyncThunk<NewRoomResponseStructure, CreateRoomP
 
 export const updateRoom = createAsyncThunk<NewRoomResponseStructure, UpdateRoomPayload, { rejectValue: ApiErrorResponse }>(
     'gameManage/updateRoom',
-    async (updateRoomPayload, { rejectWithValue }) => {
+    async (updateRoomPayload, thunkApi) => {
         try {
             const response = await privateApi.put<NewRoomResponseStructure>(`rooms/updateRoom/${updateRoomPayload.id}`, updateRoomPayload);
+
+            const state = thunkApi.getState() as RootState;
+            thunkApi.dispatch(getRooms({
+                createdBy: state.auth.sessionUser?._id,
+                page: 1,
+                pageSize: 5
+            }));
+
             return response.data;
         } catch (error) {
             // Handle Axios errors
             if (axios.isAxiosError(error)) {
                 const axiosError = error as AxiosError<ApiErrorResponse>;
-                return rejectWithValue({
+                return thunkApi.rejectWithValue({
                     success: false,
                     data: null,
                     error: {
@@ -105,7 +134,7 @@ export const updateRoom = createAsyncThunk<NewRoomResponseStructure, UpdateRoomP
                 });
             }
             // Handle any other unexpected errors
-            return rejectWithValue({
+            return thunkApi.rejectWithValue({
                 success: false,
                 data: null,
                 error: {
@@ -136,7 +165,7 @@ interface RoomsListResponse {
 
 export const getRooms = createAsyncThunk<RoomsListResponse, GetRoomsListPayload, { rejectValue: ApiErrorResponse }>(
     'gameManage/getRooms',
-    async (getRoomsPayload, { rejectWithValue }) => {
+    async (getRoomsPayload, thunkApi) => {
         try {
             const params = new URLSearchParams({
                 ...(getRoomsPayload.createdBy && { createdBy: getRoomsPayload.createdBy }),
@@ -146,12 +175,13 @@ export const getRooms = createAsyncThunk<RoomsListResponse, GetRoomsListPayload,
             });
 
             const response = await privateApi.get<RoomsListResponse>(`rooms/getRoomsList/?${params.toString()}`);
+
             return response.data;
         } catch (error) {
             // Handle Axios errors
             if (axios.isAxiosError(error)) {
                 const axiosError = error as AxiosError<ApiErrorResponse>;
-                return rejectWithValue({
+                return thunkApi.rejectWithValue({
                     success: false,
                     data: null,
                     error: {
@@ -161,7 +191,7 @@ export const getRooms = createAsyncThunk<RoomsListResponse, GetRoomsListPayload,
                 });
             }
             // Handle any other unexpected errors
-            return rejectWithValue({
+            return thunkApi.rejectWithValue({
                 success: false,
                 data: null,
                 error: {

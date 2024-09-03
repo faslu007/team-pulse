@@ -2,6 +2,8 @@ import asyncHandler from 'express-async-handler';
 import { validationResult } from 'express-validator';
 import Room from "../../models/Room.js";
 import moment from "moment"
+import Game from '../../models/Game.js';
+import { gameRichTextSample } from './gameRichTextSample.js';
 
 
 
@@ -60,12 +62,34 @@ export const registerRoom = asyncHandler(async (req, res) => {
             invitationMessage: invitationMessage ?? ""
         });
 
+        console.log(room.toJSON()._id)
+
+        let slideId;
+
+        if (room.toJSON()._id) {
+            const game = await Game.create({
+                roomId: room.toJSON()._id,
+                slides: [{
+                    order: 1,
+                    activeContentType: 'richText',
+                    richTextContent: gameRichTextSample,
+                }]
+            });
+
+            // Convert the game object to JSON
+            const gameJson = game.toJSON();
+
+            // Extract the slide ID of the newly created slide
+            slideId = gameJson.slides[0]._id;
+        }
+
         if (room) {
             return res.status(201).json({
-                room
+                room,
+                slideId  // Include the slideId in the response
             });
         } else {
-            throw "An error occurred while creating room / game session."
+            throw "An error occurred while creating room / game session.";
         }
 
     } catch (error) {
@@ -213,10 +237,28 @@ export const getRoomsList = asyncHandler(async (req, res) => {
         // Calculate the total number of pages
         const totalPages = Math.ceil(totalCount / parsedPageSize);
 
+        // Fetch game slides for each room
+        const roomsWithSlides = await Promise.all(rooms.map(async (room) => {
+            let firstSlideId = null;
+
+            if (room._id) {
+                // Find the game associated with the room
+                const game = await Game.findOne({ roomId: room._id }).lean().exec();
+                if (game && game.slides.length > 0) {
+                    firstSlideId = game.slides[0]._id;
+                }
+            }
+
+            return {
+                ...room,
+                firstSlideId
+            };
+        }));
+
         // Respond with the rooms list and pagination details
         return res.status(200).json({
             message: 'Ok',
-            result: rooms,
+            result: roomsWithSlides,
             page: parsedPage,
             totalPages,
             totalCount

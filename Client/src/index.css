@@ -3,10 +3,15 @@
 }
 
 .editorClassName {
+  padding: 5px;
     background-color: #fff !important;
     color: rgb(63, 59, 59);
 }
 
 .toolbarClassName {
     color: rgb(63, 59, 59);
+}
+
+.reorder-item:hover .edit-icon {
+        display: inline-flex;
 }

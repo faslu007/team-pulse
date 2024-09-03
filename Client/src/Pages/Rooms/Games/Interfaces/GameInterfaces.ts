@@ -48,4 +48,5 @@ export interface Room {
     updatedAt: string;
     invitationMessage?: string
     __v: number;
+    firstSlideId?: string;
 }
