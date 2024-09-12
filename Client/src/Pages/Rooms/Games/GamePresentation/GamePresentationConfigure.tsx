@@ -9,7 +9,7 @@ import RichTextEditor from './RichTextEditor';
 import SlidesList from './SlidesList';
 import MediaContent from './MediaContent';
 import { useEffect } from 'react';
-import { getDraftSlide } from './gamePresentationThunk';
+import { getDraftSlide, toggleActiveSlideContentType } from './gamePresentationThunk';
 import { useSnackbar } from '../../../../commons/Snackbar/Snackbar';
 
 const GamePresentationConfigure: React.FC = () => {
@@ -18,9 +18,13 @@ const GamePresentationConfigure: React.FC = () => {
     const gamePresentationData: PresentationDraftState = useAppSelector((state: RootState) => state.gamePresentationDraft);
     const apiStatus: PresentationDraftState["apiStatus"] = useAppSelector((state: RootState) => state.gamePresentationDraft.apiStatus);
 
-    const handleToggleChange = (event: React.MouseEvent<HTMLElement>, newView: string | null) => {
-        if (newView !== null) {
-            // setView(newView);
+    const handleToggleChange = (event: React.MouseEvent<HTMLElement>, newView: string) => {
+        if (gamePresentationData.activeRoomId && gamePresentationData.activeSlideId) {
+            dispatch(toggleActiveSlideContentType({
+                roomId: gamePresentationData.activeRoomId,
+                slideId: gamePresentationData.activeSlideId,
+                activeContentType: newView
+            }))
         }
     };
 
@@ -46,6 +50,7 @@ const GamePresentationConfigure: React.FC = () => {
                     Configure Presentation
                 </Typography>
                 <ToggleButtonGroup
+                    disabled={apiStatus.isLoading}
                     color="primary"
                     value={gamePresentationData.draftSlide.activeContentType}
                     exclusive

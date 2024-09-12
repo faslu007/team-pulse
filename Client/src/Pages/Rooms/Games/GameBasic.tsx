@@ -194,7 +194,11 @@ function GameBasicDetails() {
                 <SelectComponent
                     id={"room-status-selector"}
                     label="Room Status"
-                    options={gameStatusOptions}
+                    options={gameStatusOptions.map(item =>
+                        (gameBasicInputData._id || gameBasicInputData.id) && item.id === 'publish'
+                            ? { ...item, disabled: false }  // Disable "publish" when gameBasicInputData.id is not available
+                            : item  // Return the item as is
+                    )}
                     minWidth="100%"
                     name="gameStatus"
                     helperText="Manage game status as Draft and Publish"

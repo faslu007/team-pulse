@@ -2,10 +2,8 @@ import asyncHandler from 'express-async-handler';
 import { validationResult } from 'express-validator';
 import Room from "../../models/Room.js";
 import moment from "moment"
-import Game from '../../models/Game.js';
-import { gameRichTextSample } from './gameRichTextSample.js';
-
-
+import { Game } from '../../models/Game.js';
+import User from '../../models/User.js';
 
 /**
  * Create a game room 
@@ -72,7 +70,7 @@ export const registerRoom = asyncHandler(async (req, res) => {
                 slides: [{
                     order: 1,
                     activeContentType: 'richText',
-                    richTextContent: gameRichTextSample,
+                    // richTextContent: JSON.stringify(gameRichTextSample),
                 }]
             });
 
@@ -228,6 +226,7 @@ export const getRoomsList = asyncHandler(async (req, res) => {
             .sort({ updatedAt: -1 })
             .limit(parsedPageSize)
             .skip(skip)
+
             .lean({ virtuals: true })
             .exec();
 
@@ -241,15 +240,18 @@ export const getRoomsList = asyncHandler(async (req, res) => {
         const roomsWithSlides = await Promise.all(rooms.map(async (room) => {
             let firstSlideId = null;
 
-            if (room._id) {
-                // Find the game associated with the room
-                const game = await Game.findOne({ roomId: room._id }).lean().exec();
-                if (game && game.slides.length > 0) {
-                    firstSlideId = game.slides[0]._id;
-                }
+            // Find the game associated with the room
+            const game = await Game.findOne({ roomId: room._id }).lean().exec();
+
+            if (game && game.slides.length > 0) {
+                // Sort slides by the 'order' property in ascending order
+                const sortedSlides = game.slides.sort((a, b) => a.order - b.order);
+                // Get the ID of the first slide after sorting
+                firstSlideId = sortedSlides[0]._id;
             }
 
             return {
+                id: room._id,
                 ...room,
                 firstSlideId
             };
@@ -269,4 +271,60 @@ export const getRoomsList = asyncHandler(async (req, res) => {
             message: 'Failed to fetch rooms. Please try again later.',
         });
     }
+});
+
+
+/**
+ * @description Get Upcoming Events List
+ * @method GET
+ * @param {string} req.user.id from middleware
+ */
+export const getUpcomingEvents = asyncHandler(async (req, res) => {
+    if (!req.user._id) {
+        throw new Error('Valid user Id is required to get the events list.');
+    }
+
+    const now = new Date();
+
+    const games = await Game.find({
+        'participants.user': req.user._id
+    }).populate({
+        path: 'roomId',
+        match: {
+            roomStartsAt: { $gte: now },
+            roomExpiresAt: { $gt: now }
+        },
+        select: '-__v',
+        populate: {
+            path: 'createdBy',
+            model: User,
+            select: 'firstName lastName displayName'
+        }
+    }).select('roomId');
+
+    // Filter out games where roomId is null (due to populate match)
+    const upcomingGames = games.filter(game => game.roomId !== null);
+
+    if (!upcomingGames.length) {
+        return res.status(404).json({
+            message: 'No upcoming events found for this user.'
+        });
+    }
+
+    // Extract room details, sort by start time, and add hostedBy
+    const roomsList = upcomingGames
+        .map(game => {
+            const room = game.roomId.toObject();
+            return {
+                ...room,
+                hostedBy: room.createdBy.displayName || `${room.createdBy.firstName} ${room.createdBy.lastName}`,
+                createdBy: room.createdBy._id // Keep only the ID for createdBy
+            };
+        })
+        .sort((a, b) => a.roomStartsAt - b.roomStartsAt);
+
+    res.status(200).json({
+        message: 'Upcoming events retrieved successfully.',
+        events: roomsList
+    });
 });

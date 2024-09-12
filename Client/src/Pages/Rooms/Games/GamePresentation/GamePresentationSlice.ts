@@ -1,7 +1,7 @@
 import { EditorState } from 'draft-js';
 import { PresentationDraftState, UpdateInputFieldValuesPayload } from "./GamePresentationInterface";
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { getDraftSlide } from './gamePresentationThunk';
+import { getDraftSlide, toggleActiveSlideContentType } from './gamePresentationThunk';
 
 const gamePresentationDraftInitialState: PresentationDraftState = {
     activeRoomId: null,
@@ -10,7 +10,7 @@ const gamePresentationDraftInitialState: PresentationDraftState = {
         _id: '',
         order: 0,
         activeContentType: 'mediaContent',
-        richTextContent: EditorState.createEmpty(),
+        richTextContent: JSON.stringify(EditorState.createEmpty()),
     },
     slides: [],
     apiStatus: {
@@ -64,6 +64,27 @@ const gamePresentationDraftSlice = createSlice({
                 }
             })
             .addCase(getDraftSlide.rejected, (state, action) => {
+                state.apiStatus.isLoading = false;
+                state.apiStatus.isError = false;
+                state.apiStatus.isSuccess = false;
+                state.apiStatus.message = action.payload?.error?.message?.error?.message || 'An error occurred';
+            })
+
+
+            .addCase(toggleActiveSlideContentType.pending, (state) => {
+                state.apiStatus.isLoading = true;
+                state.apiStatus.isError = false;
+                state.apiStatus.isSuccess = false;
+            })
+            .addCase(toggleActiveSlideContentType.fulfilled, (state, action) => {
+                if (action.payload?.updatedSlide) {
+                    state.draftSlide.activeContentType = action.payload?.updatedSlide?.activeContentType;
+                    state.apiStatus.isLoading = false;
+                    state.apiStatus.isSuccess = true;
+                    state.apiStatus.isError = false;
+                }
+            })
+            .addCase(toggleActiveSlideContentType.rejected, (state, action) => {
                 state.apiStatus.isLoading = false;
                 state.apiStatus.isError = false;
                 state.apiStatus.isSuccess = false;

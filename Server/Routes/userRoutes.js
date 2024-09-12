@@ -3,7 +3,10 @@ import path from 'path';
 import multer from 'multer';
 
 // Import controllers
-import { loginUser, registerUser } from '../controllers/UserControllers/authController.js';
+import { loginUser, registerUser, searchUsers } from '../controllers/UserControllers/authController.js';
+
+// Import middleware
+import { protect } from '../middlewares/authMiddleware.js';
 
 // Initialize the router
 const router = express.Router();
@@ -15,6 +18,7 @@ const upload = multer();
 // API: /api/users
 router.post('/loginUser', upload.none(), loginUser);
 router.post('/registerUser', upload.none(), registerUser);
+router.post('/search', protect, searchUsers);
 
 // Export the router
 export default router;

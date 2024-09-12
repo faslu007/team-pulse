@@ -11,6 +11,7 @@ import { updateInputFieldValues } from "./GameSlices";
 import GamePresentationConfigure from "./GamePresentation/GamePresentationConfigure";
 import { useSnackbar } from "../../../commons/Snackbar/Snackbar";
 import { updateInputFieldValues as gamePresentationDraftStateUpdate } from "./GamePresentation/GamePresentationSlice";
+import ManageParticipants from "./Participants/Participants";
 
 
 const tableColumns = [
@@ -139,6 +140,7 @@ function GameManage() {
 
 
                 <TabPanel value="2"><GamePresentationConfigure /></TabPanel>
+                <TabPanel value="3"><ManageParticipants /></TabPanel>
             </TabContext>
         </Paper>
     )

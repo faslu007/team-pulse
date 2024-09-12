@@ -143,3 +143,45 @@ export const loginUser = asyncHandler(async (req, res) => {
         res.status(500).json({ error: error.message || 'Internal server error' });
     }
 });
+
+
+
+/**
+ * Search Users by Email
+ * Route POST /users/search
+ * Access Private
+ */
+export const searchUsers = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    if (!email || email.length < 3) {
+        return res.status(400).json({
+            message: 'Email query must be at least 3 characters long.'
+        });
+    }
+
+    try {
+        // Escape special regex characters in the email
+        const escapedEmail = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        // Create a case-insensitive regex that matches the email anywhere in the string
+        const emailRegex = new RegExp(escapedEmail, 'i');
+
+        const users = await User.find({
+            email: emailRegex,
+            isActive: true
+        })
+            .select('_id customUserId firstName lastName email')
+            .limit(10);  // Limit the results to 10 users
+
+        res.status(200).json({
+            message: 'Users fetched successfully.',
+            users: users
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error searching for users.',
+            error: error.message
+        });
+    }
+});

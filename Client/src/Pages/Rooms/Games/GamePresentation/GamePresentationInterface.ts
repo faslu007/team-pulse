@@ -1,4 +1,3 @@
-import { EditorState } from 'draft-js';
 import { apiStatus } from '../../../../CommonInterfaces';
 
 export interface Slide {
@@ -8,7 +7,7 @@ export interface Slide {
     mediaContentType?: 'audio' | 'video' | 'richText' | 'image';
     mediaContentUri?: string;
     contentTypeExtension?: string;
-    richTextContent?: EditorState;
+    richTextContent?: string;
 }
 
 export interface PresentationDraftState {

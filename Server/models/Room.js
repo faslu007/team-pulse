@@ -5,10 +5,6 @@ const { Schema, model } = mongoose;
 
 
 const roomSchema = new Schema({
-    roomId: {
-        type: Number,
-        unique: true,
-    },
     roomName: {
         type: String,
         required: true,
@@ -60,27 +56,6 @@ const roomSchema = new Schema({
     toObject: { virtuals: true, getters: true },
 });
 
-
-roomSchema.pre('save', async function (next) {
-    if (this.isNew) {
-        try {
-            // Find the maximum 'customUserId' in the collection
-            const highestCustomId = await this.constructor.findOne()
-                .sort({ customUserId: -1 })
-                .select('customUserId')
-                .lean()
-                .exec();
-
-            // Increment 'customUserId' for the new document
-            this.customUserId = (highestCustomId ? highestCustomId.customUserId : 0) + 1;
-            next();
-        } catch (error) {
-            next(error);
-        }
-    } else {
-        next();
-    }
-});
 
 const Room = model('Room', roomSchema);
 

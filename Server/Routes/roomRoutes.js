@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import multer from 'multer';
-import { getRoomsList, registerRoom, updateRoom } from '../controllers/RoomControllers/roomControllers.js';
+import { getRoomsList, getUpcomingEvents, registerRoom, updateRoom } from '../controllers/RoomControllers/roomControllers.js';
 import { protect } from '../middlewares/authMiddleware.js';
 
 // Import controllers
@@ -18,6 +18,7 @@ const upload = multer();
 router.post('/createRoom', upload.none(), protect, registerRoom);
 router.get('/getRoomsList', upload.none(), protect, getRoomsList);
 router.put('/updateRoom/:id', upload.none(), protect, updateRoom);
+router.get('/getUpcomingEvents/', upload.none(), protect, getUpcomingEvents);
 
 // Export the router
 export default router;

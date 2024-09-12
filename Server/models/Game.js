@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-
+import mongoose from 'mongoose'
 const { Schema, model } = mongoose;
 
 const slideSchema = new Schema({
@@ -23,7 +22,7 @@ const slideSchema = new Schema({
         type: String,
     },
     richTextContent: {
-        type: Object,
+        type: String,
     },
 });
 
@@ -51,18 +50,8 @@ const buzzerInteractionSchema = new Schema({
     }
 });
 
-
-const teamSchema = new Schema({
-    teamName: {
-        type: String,
-        required: true,
-        trim: true
-    }
-});
-
-
 const scoreSchema = new Schema({
-    userId: {
+    participant: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
@@ -73,23 +62,6 @@ const scoreSchema = new Schema({
     }
 });
 
-const memberSchema = new Schema({
-    userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    teamId: {
-        type: String,
-        required: true
-    },
-    active: {
-        type: Boolean,
-        default: true
-    }
-});
-
-
 const gameSchema = new Schema({
     roomId: {
         type: Schema.Types.ObjectId,
@@ -97,15 +69,29 @@ const gameSchema = new Schema({
         required: true
     },
     slides: [slideSchema],
-    participants: [memberSchema],
-    teams: [teamSchema],
-    memberScores: [scoreSchema],
+    participants: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'  // User reference
+        },
+        team: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Team'  // Team reference
+        }
+    }],
+    teams: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Team'  // Team reference
+    }],
+    scores: [scoreSchema],
     buzzer: buzzerSchema,
     buzzerInteractions: [buzzerInteractionSchema]
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
 const Game = model('Game', gameSchema);
 
-export default Game;
+export { Game };

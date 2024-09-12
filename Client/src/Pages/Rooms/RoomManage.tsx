@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks";
 import { useSnackbar } from "../../commons/Snackbar/Snackbar";
 import { RootState } from "../../Store";
 import RoomCreate from "./CreateRoom";
+import UpcomingEvents from "./UpcomingEvents";
 
 
 
@@ -21,7 +22,6 @@ const RoomManage: React.FC = () => {
 
 
     return (
-        <>
             <Box
                 minHeight="100vh"
                 width="100%"
@@ -59,15 +59,14 @@ const RoomManage: React.FC = () => {
                         flex={isMobile ? "none" : "0 0 30%"}
                         display="flex"
                         flexDirection="column"
-                        justifyContent="center"
-                        alignItems="center"
+                    // justifyContent="center"
+                    // alignItems="center"
                         p={2}
                     >
-                        Hello woRL
+                    <UpcomingEvents />
                     </Box>
                 </Box>
-            </Box>
-        </>
+        </Box>
     );
 };
 

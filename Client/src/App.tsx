@@ -11,13 +11,12 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 function App() {
-
   const renderRoutes = () => (
-    <Routes>L
+    <Routes>
       <Route element={<PrivateRoutes />}>
-        <Route path="/" element={<Auth />} />
         <Route path="/manage-session" element={<RoomManage />} />
       </Route>
+      <Route path="/" element={<Auth />} />
     </Routes>
   );
 

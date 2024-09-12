@@ -1,14 +1,16 @@
 import express from "express";
 const app = express();
+import { createServer } from "http";
+import { initializeSocket } from './socket/index.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { createServer } from "http";
-import { Server } from "socket.io";
-
 import bodyParser from "body-parser";
+import chalk from 'chalk';
 
 const port = process.env.NODE_ENV === 'production' ? process.env.PORT_PROD : process.env.PORT_LOCAL_AND_DEVELOPMENT;
+const socket_port = process.env.SOCKET_PORT_LOCAL_AND_DEVELOPMENT;
+
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectDB } from "./utils/db.js";
@@ -51,35 +53,11 @@ app.use(errorHandler);
 
 
 // Create HTTP server and bind it with Socket.IO
-const httpServer = createServer();
-const io = new Server(httpServer, { /* options */ });
+const httpServer = createServer(app);
+const io = initializeSocket(httpServer);
 
-io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.id}`);
-
-    // Join room
-    socket.on('joinRoom', (roomId, userId) => {
-        socket.join(roomId);
-        activeUsers.set(socket.id, { userId, roomId });
-        console.log(`User ${userId} joined room ${roomId}`);
-        io.to(roomId).emit('userJoined', userId);
-    });
-
-    // Handle user disconnection
-    socket.on('disconnect', () => {
-        const user = activeUsers.get(socket.id);
-        if (user) {
-            const { userId, roomId } = user;
-            activeUsers.delete(socket.id);
-            console.log(`User ${userId} disconnected from room ${roomId}`);
-            io.to(roomId).emit('userDisconnected', userId);
-        }
-    });
-});
-
-httpServer.listen(4001);
-
-app.listen(port, () => console.log(`Server started on ${port}`));
+httpServer.listen(socket_port, () => console.log(chalk.cyan(`Socket instantiated on port ${socket_port}`)));
+app.listen(port, () => console.log(chalk.green(`Server started on port ${port}`)));
 
 
 

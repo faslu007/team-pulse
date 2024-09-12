@@ -22,7 +22,7 @@ const initialState: AuthState = {
         message: ""
     },
     sessionUser: {
-        id: localStorage.getItem('user') || ""
+        id: localStorage.getItem('_id') || ""
     },
     loginInput: {
         email: "",
@@ -69,7 +69,7 @@ const authSlice = createSlice({
                 state.apiStatus.isSuccess = true;
                 state.apiStatus.isError = false;
                 state.apiStatus.message = "Logged in successfully.";
-                localStorage.setItem("user", action.payload?.id ?? "")
+                localStorage.setItem("_id", action.payload?.id ?? "")
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.apiStatus.isLoading = false;
@@ -89,7 +89,7 @@ const authSlice = createSlice({
                 state.apiStatus.isSuccess = true;
                 state.apiStatus.isError = false;
                 state.apiStatus.message = "Registered successfully.";
-                localStorage.setItem("user", action.payload?.id ?? "")
+                localStorage.setItem("_id", action.payload?.id ?? "")
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.apiStatus.isLoading = false;
