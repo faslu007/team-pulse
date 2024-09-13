@@ -9,12 +9,14 @@ import { SnackbarProvider } from './commons/Snackbar/Snackbar';
 import RoomManage from './Pages/Rooms/RoomManage';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import LiveEvent from './Pages/LiveEvent/Event';
 
 function App() {
   const renderRoutes = () => (
     <Routes>
       <Route element={<PrivateRoutes />}>
         <Route path="/manage-session" element={<RoomManage />} />
+        <Route path="/live-event/:roomId" element={<LiveEvent />} />
       </Route>
       <Route path="/" element={<Auth />} />
     </Routes>

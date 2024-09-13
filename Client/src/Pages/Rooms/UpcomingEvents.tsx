@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import EventIcon from '@mui/icons-material/Event';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PersonIcon from '@mui/icons-material/Person';
+import { useNavigate } from 'react-router-dom';
 
 interface Event {
     _id: string;
@@ -29,6 +30,7 @@ type UpcomingEvents = Event[];
 function UpcomingEvents() {
     const [upComingEvents, setUpComingEvents] = useState<UpcomingEvents>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         getUpcomingEvents();
@@ -49,8 +51,7 @@ function UpcomingEvents() {
     };
 
     const handleJoin = (eventId: string) => {
-        // Implement join functionality here
-        console.log(`Joining event with ID: ${eventId}`);
+        navigate(`/live-event/${eventId}`);
     };
 
     const formatDate = (dateString: string) => {

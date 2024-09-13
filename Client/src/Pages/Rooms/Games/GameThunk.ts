@@ -62,7 +62,7 @@ export const createRoom = createAsyncThunk<NewRoomResponseStructure, CreateRoomP
             const response = await privateApi.post<NewRoomResponseStructure>("rooms/createRoom", createRoomPayload);
             const state = thunkApi.getState() as RootState;
             thunkApi.dispatch(getRooms({
-                createdBy: state.auth.sessionUser?._id,
+                createdBy: state.auth.sessionUser?._id || state.auth.sessionUser?.id,
                 page: 1,
                 pageSize: 5
             }));
@@ -114,7 +114,7 @@ export const updateRoom = createAsyncThunk<NewRoomResponseStructure, UpdateRoomP
 
             const state = thunkApi.getState() as RootState;
             thunkApi.dispatch(getRooms({
-                createdBy: state.auth.sessionUser?._id,
+                createdBy: state.auth.sessionUser?._id || state.auth.sessionUser?.id,
                 page: 1,
                 pageSize: 5
             }));
