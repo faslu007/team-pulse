@@ -60,7 +60,6 @@ export const registerRoom = asyncHandler(async (req, res) => {
             invitationMessage: invitationMessage ?? ""
         });
 
-        console.log(room.toJSON()._id)
 
         let slideId;
 
@@ -71,7 +70,13 @@ export const registerRoom = asyncHandler(async (req, res) => {
                     order: 1,
                     activeContentType: 'richText',
                     // richTextContent: JSON.stringify(gameRichTextSample),
-                }]
+                }],
+                participants: [
+                    {
+                        user: req.user.id,
+                        team: null
+                    }
+                ]
             });
 
             // Convert the game object to JSON
@@ -326,5 +331,55 @@ export const getUpcomingEvents = asyncHandler(async (req, res) => {
     res.status(200).json({
         message: 'Upcoming events retrieved successfully.',
         events: roomsList
+    });
+});
+
+
+
+/**
+ * @description Valid room or event join request
+ * @method GET
+ * @param {String} req.params.roomId
+ */
+export const validateRoomJoinRequest = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const roomId = req.query.roomId;
+
+    // Check if this is a valid room
+    const room = await Room.findById(roomId);
+    if (!room) {
+        return res.status(404).json({
+            message: 'Room not found.'
+        });
+    }
+
+    // Check if the room is active
+    const now = new Date();
+    if (room.roomStartsAt > now || room.roomExpiresAt < now) {
+        return res.status(403).json({
+            message: 'This room is not currently active.'
+        });
+    }
+
+    // Check if the user is a participant
+    const game = await Game.findOne({
+        roomId: roomId,
+        'participants.user': userId
+    });
+
+    if (!game) {
+        return res.status(403).json({
+            message: 'You are not a participant in this room.'
+        });
+    }
+
+    return res.status(200).json({
+        message: 'You are a valid participant for this room.',
+        roomDetails: {
+            id: room._id,
+            name: room.roomName,
+            startsAt: room.roomStartsAt,
+            expiresAt: room.roomExpiresAt
+        }
     });
 });
